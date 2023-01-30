@@ -1,0 +1,50 @@
+
+import {signup_url, base_url, token_url} from '../Config';
+
+//generate auth token
+  const generateToken = async (username, password) => {
+    const encodedCredentials = Buffer.from(`${username}:${password}`, 'utf8').toString('base64');
+    const response = await fetch(token_url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${encodedCredentials}`
+      },
+      body: JSON.stringify(user)
+    });
+  
+    if (!response.ok) {
+      throw new Error('Failed to generate token');
+    }
+  
+    const token = await response.json();
+    return token;
+  };
+
+  //signup user
+  async function signup(email, username, password) {
+   
+   console.log(base_url);
+    try {
+      const response = await fetch(signup_url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email,
+          username,
+          password
+        })
+      });
+
+
+      const newUser = await response.json();
+      const token = await generateToken(newUser.username, newUser.password);
+      // Add the token to the user object
+      newUser.token = token;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  export default AuthService; 
